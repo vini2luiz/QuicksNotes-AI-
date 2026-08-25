@@ -13,6 +13,10 @@ CREATE TABLE IF NOT EXISTS public.notes (
   updated_at TIMESTAMPTZ DEFAULT now() NOT NULL
 );
 
+-- OPÇÃO: Habilitar busca semântica / vetores com pgvector (liquid/lfm-2.5-embedding-350m:free = 1024 dimensões)
+-- CREATE EXTENSION IF NOT EXISTS vector;
+-- ALTER TABLE public.notes ADD COLUMN IF NOT EXISTS embedding vector(1024);
+
 -- Index para buscas eficientes por usuário e data de criação
 CREATE INDEX IF NOT EXISTS idx_notes_user_id ON public.notes(user_id);
 CREATE INDEX IF NOT EXISTS idx_notes_created_at ON public.notes(created_at DESC);
