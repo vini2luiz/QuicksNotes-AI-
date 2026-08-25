@@ -38,7 +38,7 @@ export async function generateEmbedding(
       headers: {
         'Authorization': `Bearer ${openRouterKey}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': 'http://localhost:3000',
+        'HTTP-Referer': process.env.NEXTAUTH_URL || 'https://quicks-notes-ai.vercel.app',
         'X-Title': 'QuickNotes AI',
       },
       body: JSON.stringify({

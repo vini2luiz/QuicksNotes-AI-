@@ -2,7 +2,7 @@ import Anthropic from '@anthropic-ai/sdk';
 
 /**
  * Lista de modelos gratuitos ativos do OpenRouter para fallback automático.
- * 'openrouter/free' é o auto-router oficial do OpenRouter que roteia automaticamente para o modelo gratuito online no momento.
+ * 'openrouter/free' é o auto-router oficial do OpenRouter que escolhe o modelo gratuito online no momento.
  */
 const FREE_OPENROUTER_MODELS = [
   'openrouter/free',
@@ -13,8 +13,45 @@ const FREE_OPENROUTER_MODELS = [
 ];
 
 /**
+ * Limpa o texto retornado pela IA, removendo rascunhos em inglês ou blocos de raciocínio (<think>...).
+ */
+function sanitizeSummaryOutput(rawText: string): string {
+  if (!rawText) return '';
+  
+  let cleaned = rawText;
+
+  // 1. Remove blocos no formato <think>...</think> (comum em modelos estilo DeepSeek R1)
+  cleaned = cleaned.replace(/<think>[\s\S]*?<\/think>/gi, '');
+
+  // 2. Se o modelo incluiu rascunho de pensamento em inglês (ex: "Here's a thinking process...", "First, the user asked...")
+  if (/thinking process|first,\s*the user|let's analyze/i.test(cleaned)) {
+    const lines = cleaned.split('\n').map(l => l.trim()).filter(Boolean);
+    // Filtra linhas que sejam passos de rascunho (ex: "1. Analyze...", "- velozes...")
+    const validLines = lines.filter(line => 
+      !/^here's/i.test(line) &&
+      !/^first,/i.test(line) &&
+      !/^let's/i.test(line) &&
+      !/^\d+\./.test(line) &&
+      !line.startsWith('- ') &&
+      !line.startsWith('* ')
+    );
+
+    if (validLines.length > 0) {
+      // Pega a última linha limpa (onde fica o resumo final)
+      cleaned = validLines[validLines.length - 1];
+    }
+  }
+
+  // 3. Remove prefixos como "Resumo:" ou aspas desnecessárias
+  cleaned = cleaned.replace(/^(resumo|resumo final):\s*/i, '');
+  cleaned = cleaned.replace(/^["'«“]([\s\S]*)["'»”]$/, '$1');
+
+  return cleaned.trim();
+}
+
+/**
  * Gera um resumo direto e conciso de 1-2 frases para o conteúdo de uma nota.
- * Suporta OpenRouter (Auto-Router Roteador 100% Gratuito) ou Anthropic Claude.
+ * Suporta OpenRouter (Modelos Gratuitos com Auto-Router) ou Anthropic Claude.
  * 
  * @param content Conteúdo da nota a ser resumida
  * @returns Texto do resumo gerado
@@ -27,7 +64,7 @@ export async function generateNoteSummary(content: string): Promise<string> {
   const openRouterKey = process.env.OPENROUTER_API_KEY || '';
   const anthropicKey = process.env.ANTHROPIC_API_KEY || '';
 
-  // 1. Prioridade: OpenRouter (Suporta roteamento automático 100% gratuito)
+  // 1. Prioridade: OpenRouter (Modelos 100% gratuitos com fallback)
   if (openRouterKey && !openRouterKey.includes('placeholder') && !openRouterKey.includes('sua_chave')) {
     const envModel = process.env.OPENROUTER_MODEL || 'openrouter/free';
     
@@ -44,7 +81,7 @@ export async function generateNoteSummary(content: string): Promise<string> {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${openRouterKey}`,
-            'HTTP-Referer': 'http://localhost:3000',
+            'HTTP-Referer': process.env.NEXTAUTH_URL || 'https://quicks-notes-ai.vercel.app',
             'X-Title': 'QuickNotes AI',
             'Content-Type': 'application/json',
           },
@@ -52,11 +89,15 @@ export async function generateNoteSummary(content: string): Promise<string> {
             model: model,
             messages: [
               {
+                role: 'system',
+                content: 'Você é um assistente especialista em resumos. Responda APENAS com o resumo final em Português do Brasil. Não inclua pensamentos internos, rascunhos ou texto em inglês.',
+              },
+              {
                 role: 'user',
-                content: `Resuma o seguinte texto em EXATAMENTE 1 ou 2 frases curtas, objetivas e em português do Brasil. Capture a essência principal da nota sem enrolação:\n\n"""\n${content}\n"""`,
+                content: `Resuma o seguinte texto em EXATAMENTE 1 ou 2 frases curtas, objetivas e em português do Brasil:\n\n"""\n${content}\n"""`,
               },
             ],
-            max_tokens: 200,
+            max_tokens: 1000, // Aumentado para permitir que modelos de raciocínio concluam a resposta
             temperature: 0.3,
           }),
         });
@@ -65,23 +106,16 @@ export async function generateNoteSummary(content: string): Promise<string> {
 
         if (!response.ok) {
           const errMsg = data?.error?.message || `Status HTTP ${response.status}`;
-          console.warn(`[OpenRouter] Modelo ${model} falhou: ${errMsg}. Tentando próximo modelo...`);
+          console.warn(`[OpenRouter] Modelo ${model} falhou: ${errMsg}. Tentando próximo...`);
           lastError = errMsg;
           continue;
         }
 
-        let summaryText = data.choices?.[0]?.message?.content;
-        
-        // Se a resposta vier vazia no content mas houver texto no reasoning ou refusal, limpa
-        if (!summaryText && data.choices?.[0]?.message?.reasoning) {
-          summaryText = data.choices[0].message.reasoning;
-        }
-
-        if (summaryText) {
-          // Remove tags de raciocínio de modelos estilo DeepSeek (<think>...</think>)
-          summaryText = summaryText.replace(/<think>[\s\S]*?<\/think>/gi, '').trim();
-          if (summaryText) {
-            return summaryText;
+        const rawContent = data.choices?.[0]?.message?.content;
+        if (rawContent) {
+          const cleanResult = sanitizeSummaryOutput(rawContent);
+          if (cleanResult) {
+            return cleanResult;
           }
         }
 
@@ -101,7 +135,7 @@ export async function generateNoteSummary(content: string): Promise<string> {
       const anthropicClient = new Anthropic({ apiKey: anthropicKey });
       const response = await anthropicClient.messages.create({
         model: 'claude-3-5-haiku-20241022',
-        max_tokens: 200,
+        max_tokens: 300,
         temperature: 0.3,
         messages: [
           {
@@ -113,7 +147,7 @@ export async function generateNoteSummary(content: string): Promise<string> {
 
       const firstBlock = response.content[0];
       if (firstBlock && firstBlock.type === 'text') {
-        return firstBlock.text.trim();
+        return sanitizeSummaryOutput(firstBlock.text);
       }
 
       throw new Error('Não foi possível extrair o texto do resumo retornado pelo Claude.');
