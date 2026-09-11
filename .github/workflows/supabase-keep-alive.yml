@@ -1,0 +1,29 @@
+name: Supabase Keep-Alive
+
+on:
+  schedule:
+    # Runs at 12:00 UTC every 3 days — well under Supabase's 7-day
+    # inactivity pause window, with margin for scheduling delays.
+    - cron: '0 12 */3 * *'
+  workflow_dispatch:
+
+jobs:
+  ping-supabase:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: |
+            scripts/keep-alive.mjs
+          sparse-checkout-cone-mode: false
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - run: npm install @supabase/supabase-js@^2
+
+      - run: node scripts/keep-alive.mjs
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
