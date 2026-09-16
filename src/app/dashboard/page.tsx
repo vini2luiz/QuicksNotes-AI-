@@ -126,28 +126,28 @@ export default function DashboardPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
+      <div className="min-h-screen bg-steel-950 flex items-center justify-center">
         <NoteSkeletonGrid />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-steel-950 text-steel-100 flex flex-col">
       <Header />
 
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Top Control Bar */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-slate-900/60 p-4 rounded-2xl border border-slate-800/80 backdrop-blur-md">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-steel-900/60 p-4 rounded-2xl border border-steel-800/80 backdrop-blur-md">
           {/* Search Box */}
           <div className="relative flex-1">
-            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-steel-400" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Buscar em títulos, conteúdos ou resumos..."
-              className="w-full bg-slate-800/60 border border-slate-700/50 rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/40 focus:border-indigo-500 transition-all"
+              className="w-full bg-steel-800/60 border border-steel-700/50 rounded-xl pl-10 pr-4 py-2.5 text-sm text-steel-100 placeholder:text-steel-500 focus:outline-none focus:ring-2 focus:ring-aqua-500/40 focus:border-aqua-500 transition-all"
             />
           </div>
 
@@ -156,13 +156,13 @@ export default function DashboardPage() {
             <button
               onClick={fetchNotes}
               title="Recarregar notas"
-              className="p-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/50 transition-colors"
+              className="p-2.5 rounded-xl bg-steel-800/60 hover:bg-steel-800 text-steel-300 hover:text-white border border-steel-700/50 transition-colors"
             >
               <RefreshCw className={`w-4 h-4 ${isLoading ? "animate-spin" : ""}`} />
             </button>
             <button
               onClick={handleOpenCreateModal}
-              className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/25 transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0"
+              className="flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-aqua-500 to-aqua-400 hover:from-aqua-400 hover:to-aqua-300 text-steel-950 text-sm font-semibold shadow-lg shadow-aqua-600/25 transition-all hover:scale-[1.02] active:scale-[0.98] shrink-0"
             >
               <Plus className="w-4 h-4" />
               <span>Nova Nota</span>
@@ -172,14 +172,14 @@ export default function DashboardPage() {
 
         {/* Error Alert */}
         {error && (
-          <div className="p-4 bg-rose-500/10 border border-rose-500/30 rounded-2xl text-rose-300 text-sm flex items-center justify-between">
+          <div className="p-4 bg-danger-500/10 border border-danger-500/30 rounded-2xl text-danger-300 text-sm flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <AlertCircle className="w-5 h-5 text-rose-400 shrink-0" />
+              <AlertCircle className="w-5 h-5 text-danger-400 shrink-0" />
               <span>{error}</span>
             </div>
             <button
               onClick={fetchNotes}
-              className="px-3 py-1 bg-rose-500/20 hover:bg-rose-500/30 rounded-lg text-xs font-semibold"
+              className="px-3 py-1 bg-danger-500/20 hover:bg-danger-500/30 rounded-lg text-xs font-semibold"
             >
               Tentar novamente
             </button>
@@ -190,15 +190,15 @@ export default function DashboardPage() {
         {isLoading ? (
           <NoteSkeletonGrid />
         ) : filteredNotes.length === 0 ? (
-          <div className="py-16 px-4 text-center bg-slate-900/40 border border-slate-800/60 rounded-3xl flex flex-col items-center justify-center space-y-4">
-            <div className="p-4 rounded-2xl bg-indigo-600/10 text-indigo-400">
+          <div className="py-16 px-4 text-center bg-steel-900/40 border border-steel-800/60 rounded-3xl flex flex-col items-center justify-center space-y-4">
+            <div className="p-4 rounded-2xl bg-aqua-600/10 text-aqua-400">
               <FileText className="w-10 h-10" />
             </div>
             <div className="space-y-1">
-              <h3 className="text-lg font-semibold text-slate-200">
+              <h3 className="text-lg font-semibold text-steel-200">
                 {searchQuery ? "Nenhuma nota encontrada" : "Sua coleção está vazia"}
               </h3>
-              <p className="text-sm text-slate-400 max-w-sm">
+              <p className="text-sm text-steel-400 max-w-sm">
                 {searchQuery
                   ? "Nenhuma nota atende aos critérios de busca informados."
                   : "Crie sua primeira nota e utilize a inteligência artificial para gerar resumos automáticos."}
@@ -207,7 +207,7 @@ export default function DashboardPage() {
             {!searchQuery && (
               <button
                 onClick={handleOpenCreateModal}
-                className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold transition-all"
+                className="mt-2 inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-aqua-500 hover:bg-aqua-400 text-steel-950 text-xs font-semibold transition-all"
               >
                 <Plus className="w-4 h-4" />
                 <span>Criar primeira nota</span>

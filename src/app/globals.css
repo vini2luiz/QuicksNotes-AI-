@@ -1,29 +1,150 @@
 @import "tailwindcss";
 
+/* ==========================================================================
+   QuickNotes AI — Design Tokens
+   Paleta "Mercury": grafite-teal metálico com brilhos prateados,
+   inspirada nos wallpapers de vidro líquido do iOS.
+   ========================================================================== */
+@theme {
+  /* Neutros frios (base da interface) */
+  --color-steel-50: #f3f7f7;
+  --color-steel-100: #e3ecec;
+  --color-steel-200: #c7d5d6;
+  --color-steel-300: #a2b6b8;
+  --color-steel-400: #7b9093;
+  --color-steel-500: #5e7376;
+  --color-steel-600: #4a5d60;
+  --color-steel-700: #3b4b4e;
+  --color-steel-800: #2a3639;
+  --color-steel-850: #212b2e;
+  --color-steel-900: #1a2325;
+  --color-steel-950: #0e1517;
+
+  /* Acento principal (aqua/mint moderno) */
+  --color-aqua-200: #b7efe6;
+  --color-aqua-300: #8ee2d6;
+  --color-aqua-400: #5ecdbe;
+  --color-aqua-500: #36b3a4;
+  --color-aqua-600: #229184;
+  --color-aqua-700: #1b7268;
+
+  /* Acento secundário (brilho prateado das curvas) */
+  --color-mercury-200: #dfe9ea;
+  --color-mercury-300: #c2d3d5;
+  --color-mercury-400: #9fb5b8;
+
+  /* Estados */
+  --color-danger-300: #f2b5ae;
+  --color-danger-400: #e58b80;
+  --color-danger-500: #d4685b;
+
+  /* Animações */
+  --animate-float-slow: float-slow 14s ease-in-out infinite;
+  --animate-float-slower: float-slow 20s ease-in-out infinite reverse;
+  --animate-shimmer: shimmer 6s linear infinite;
+  --animate-rise: rise 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
 :root {
-  --background: #0b0f19;
-  --foreground: #f8fafc;
+  --background: #0e1517;
+  --foreground: #f3f7f7;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
   min-height: 100vh;
-  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   overflow-x: hidden;
 }
 
-/* Custom scrollbar style */
+/* Rolagem suave para a navegação por âncoras da landing page */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Scrollbar no tom da paleta */
 ::-webkit-scrollbar {
   width: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f172a;
+  background: var(--color-steel-950);
 }
 ::-webkit-scrollbar-thumb {
-  background: #334155;
+  background: var(--color-steel-700);
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #475569;
+  background: var(--color-steel-600);
+}
+
+/* ==========================================================================
+   Utilitários de superfície (vidro metálico)
+   ========================================================================== */
+@utility glass {
+  background: linear-gradient(
+    145deg,
+    rgb(255 255 255 / 0.07),
+    rgb(255 255 255 / 0.02) 45%,
+    rgb(14 21 23 / 0.35)
+  );
+  border: 1px solid rgb(199 213 214 / 0.12);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
+}
+
+@utility text-mercury {
+  background-image: linear-gradient(
+    120deg,
+    var(--color-steel-50) 0%,
+    var(--color-mercury-300) 38%,
+    #ffffff 52%,
+    var(--color-mercury-400) 70%,
+    var(--color-steel-200) 100%
+  );
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+}
+
+@keyframes float-slow {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, -3%, 0) scale(1.06);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  100% {
+    background-position: 200% 50%;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 18px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
 }

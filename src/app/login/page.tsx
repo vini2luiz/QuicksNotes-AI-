@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { signIn, useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { Sparkles, ShieldCheck, Zap, Lock, Loader2 } from "lucide-react";
+import { Sparkles, ShieldCheck, Zap, Lock, Loader2, ArrowLeft } from "lucide-react";
 
 export default function LoginPage() {
   const { status } = useSession();
@@ -28,29 +29,38 @@ export default function LoginPage() {
 
   if (status === "loading") {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-indigo-500 animate-spin" />
+      <div className="min-h-screen bg-steel-950 flex items-center justify-center">
+        <Loader2 className="w-8 h-8 text-aqua-500 animate-spin" />
       </div>
     );
   }
 
   return (
-    <main className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-center items-center px-4 relative overflow-hidden">
+    <main className="min-h-screen bg-steel-950 text-steel-100 flex flex-col justify-center items-center px-4 relative overflow-hidden">
       {/* Background ambient lighting */}
-      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-600/15 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] bg-purple-600/10 blur-[100px] rounded-full pointer-events-none" />
+      <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-aqua-600/15 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] bg-mercury-400/10 blur-[100px] rounded-full pointer-events-none" />
+
+      {/* Voltar para a landing page */}
+      <Link
+        href="/"
+        className="absolute top-6 left-6 z-10 inline-flex items-center gap-2 rounded-full border border-steel-100/10 bg-steel-900/60 px-4 py-2 text-xs font-medium text-steel-300 backdrop-blur-md transition-colors hover:text-steel-50"
+      >
+        <ArrowLeft className="w-3.5 h-3.5" />
+        <span>Voltar ao início</span>
+      </Link>
 
       {/* Main Login Card */}
-      <div className="w-full max-w-md bg-slate-900/80 border border-slate-800 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-2xl shadow-indigo-950/40 relative z-10">
+      <div className="w-full max-w-md bg-steel-900/80 border border-steel-800 backdrop-blur-xl p-8 sm:p-10 rounded-3xl shadow-2xl shadow-aqua-700/40 relative z-10">
         {/* App Logo & Title */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigo-600 via-purple-600 to-pink-500 mb-4 shadow-xl shadow-indigo-500/30 ring-1 ring-white/20">
-            <Sparkles className="w-8 h-8 text-white animate-pulse" />
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-tr from-aqua-600 via-aqua-400 to-mercury-200 mb-4 shadow-xl shadow-aqua-500/30 ring-1 ring-white/20">
+            <Sparkles className="w-8 h-8 text-steel-950" />
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-slate-200 to-indigo-200 bg-clip-text text-transparent mb-2">
-            QuickNotes <span className="text-indigo-400">AI</span>
+          <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-white via-steel-200 to-aqua-200 bg-clip-text text-transparent mb-2">
+            QuickNotes <span className="text-aqua-400">AI</span>
           </h1>
-          <p className="text-slate-400 text-sm leading-relaxed">
+          <p className="text-steel-400 text-sm leading-relaxed">
             Suas notas com resumos automáticos gerados pela API da Anthropic Claude.
           </p>
         </div>
@@ -60,10 +70,10 @@ export default function LoginPage() {
           <button
             onClick={handleGoogleLogin}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl bg-white hover:bg-slate-100 text-slate-900 font-semibold text-sm transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] disabled:opacity-75 disabled:cursor-not-allowed group"
+            className="w-full flex items-center justify-center gap-3 px-6 py-3.5 rounded-2xl bg-white hover:bg-steel-100 text-steel-900 font-semibold text-sm transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-[1.01] active:scale-[0.99] disabled:opacity-75 disabled:cursor-not-allowed group"
           >
             {isLoading ? (
-              <Loader2 className="w-5 h-5 animate-spin text-slate-900" />
+              <Loader2 className="w-5 h-5 animate-spin text-steel-900" />
             ) : (
               <svg className="w-5 h-5 transition-transform group-hover:scale-110" viewBox="0 0 24 24">
                 <path
@@ -89,17 +99,17 @@ export default function LoginPage() {
         </div>
 
         {/* App Features Pills */}
-        <div className="mt-8 pt-6 border-t border-slate-800/80 grid grid-cols-3 gap-2 text-center text-[11px] text-slate-400">
-          <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-slate-800/30">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+        <div className="mt-8 pt-6 border-t border-steel-800/80 grid grid-cols-3 gap-2 text-center text-[11px] text-steel-400">
+          <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-steel-800/30">
+            <ShieldCheck className="w-4 h-4 text-aqua-300" />
             <span>Supabase RLS</span>
           </div>
-          <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-slate-800/30">
-            <Zap className="w-4 h-4 text-amber-400" />
+          <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-steel-800/30">
+            <Zap className="w-4 h-4 text-mercury-300" />
             <span>Claude AI</span>
           </div>
-          <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-slate-800/30">
-            <Lock className="w-4 h-4 text-indigo-400" />
+          <div className="flex flex-col items-center gap-1 p-2 rounded-xl bg-steel-800/30">
+            <Lock className="w-4 h-4 text-aqua-400" />
             <span>Google Auth</span>
           </div>
         </div>
