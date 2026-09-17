@@ -27,9 +27,14 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
       }
       return session;
     },
-    async jwt({ token, user }) {
-      if (user) {
-        token.sub = user.id || token.sub;
+    async jwt({ token, user, account }) {
+      // Sem adapter de banco, o Auth.js gera um `user.id` aleatório (crypto.randomUUID())
+      // a cada login, o que faria as notas mudarem de dono a cada nova sessão.
+      // O `providerAccountId` é o `sub` do Google: estável e permanente para a conta.
+      if (account?.providerAccountId) {
+        token.sub = account.providerAccountId;
+      } else if (user?.id) {
+        token.sub = user.id;
       }
       return token;
     },
